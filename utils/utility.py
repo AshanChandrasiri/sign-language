@@ -254,6 +254,9 @@ def process_image(image):
   
     edged_image = cv_utils.apply_canny(image, 50, 150)
     rect_pts = detect_person(image)
+
+    fg_bg = cv2.createBackgroundSubtractorMOG2()
+
     fg_mask = fg_bg.apply(image)
     fg_mask = fg_mask[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     edged_image = edged_image[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
