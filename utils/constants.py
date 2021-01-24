@@ -4,7 +4,7 @@ SLASH = "/"
 # ==========================
 #  All Path constants
 # ==========================
-BASE_PROJECT_PATH = "/content/DeepSign-A-Deep-Learning-Architecture-for-Sign-Language-Recognition/data/videos/training_data/"
+BASE_PROJECT_PATH = "/content/sign-language/"
 BASE_DATA_PATH = BASE_PROJECT_PATH+"data/"
 BASE_LOG_PATH = BASE_PROJECT_PATH+"saved_models/"
 
