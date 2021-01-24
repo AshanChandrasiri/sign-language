@@ -7,9 +7,11 @@ import tensorflow as tf
 import utils.constants as cs
 import matplotlib.pyplot as plt
 from utils import cv_utils, os_utils
-from moviepy.editor import VideoFileClipVideoFileClip
+from moviepy.editor import VideoFileClip
 from tensorflow.python.tools import freeze_graph
+from google.colab.patches import cv2_imshow
 
+import random
 
 def freeze_model(sess, logs_path, latest_checkpoint, model, pb_file_name, freeze_pb_file_name):
     """
@@ -239,14 +241,18 @@ def run_inference_for_single_image(image, graph):
 
 
 def detect_person(image):
+    print("**********************************")
+    print("printing image")
+    # cv2_imshow(image)
     path_to_ckpt = cs.BASE_LOG_PATH+cs.MODEL_SSD+cs.OBJ_DET__PB_NAME
     output_dict = run_inference_for_single_image(image, load_a_frozen_model(path_to_ckpt))
     boxes = output_dict['detection_boxes']
     rectangle_pts = boxes[0, :] * np.array([image.shape[0], image.shape[1], image.shape[0], image.shape[1]])
-    # image = image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])]
-    # plt.figure(figsize=IMAGE_SIZE)
-    # plt.imshow(image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])])
-    # plt.show()
+    image = image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])]
+    IMAGE_SIZE = (12, 8)
+    plt.figure(figsize=IMAGE_SIZE)
+    plt.imshow(image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])])
+    plt.savefig("temp.png")
     return rectangle_pts
 
 
@@ -254,10 +260,26 @@ def process_image(image):
   
     edged_image = cv_utils.apply_canny(image, 50, 150)
     rect_pts = detect_person(image)
-
+    print("**********************************")
+    print(rect_pts)
+    print("**********************************")
     fg_bg = cv2.createBackgroundSubtractorMOG2()
+    IMAGE_SIZE = (12, 8)
 
+    pic_rand = random.randint(1,100)
+
+    plt.figure(figsize=IMAGE_SIZE)
+    plt.imshow(image)
+    plt.savefig("mask/before_mask_bg_temp{0}.png".format(pic_rand))
+
+   
     fg_mask = fg_bg.apply(image)
+
+    
+    plt.figure(figsize=IMAGE_SIZE)
+    plt.imshow(fg_mask)
+    plt.savefig("mask/after_mask_bg_temp{0}.png".format(pic_rand))
+
     fg_mask = fg_mask[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     edged_image = edged_image[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     fg_mask[fg_mask > 0] = 255.0
@@ -265,7 +287,11 @@ def process_image(image):
     fg_mask = cv2.addWeighted(fg_mask, 1, edged_image, 1, 0)
     reshaped_img = cv_utils.resize(fg_mask, (500, 500))
     reshaped_img = np.dstack((reshaped_img, np.zeros_like(reshaped_img), np.zeros_like(reshaped_img)))
-    # cv2.imshow("bg_subtraction", reshaped_img)
+    # cv2_imshow(reshaped_img)
+    IMAGE_SIZE = (12, 8)
+    plt.figure(figsize=IMAGE_SIZE)
+    plt.imshow(reshaped_img)
+    plt.savefig("bg_temp.png")
     return reshaped_img
 
 
