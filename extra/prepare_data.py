@@ -3,14 +3,15 @@ from utils import constants as cs
 from utils import utility, os_utils
 
 
-def main():
+def main(drive):
    
     IMAGE_SIZE = (12, 8)
 
     path_gen = os_utils.iterate_data(cs.BASE_DATA_PATH + cs.DATA_TRAIN_VIDEOS, ".mp4")
 
+
     for path in path_gen:
-        utility.write_videos(path, cs.DATA_TRAIN_VIDEOS, cs.DATA_BG_TRAIN_VIDEO)
+        utility.write_videos(path, cs.DATA_TRAIN_VIDEOS, cs.DATA_BG_TRAIN_VIDEO, drive)
         return;
 
     
