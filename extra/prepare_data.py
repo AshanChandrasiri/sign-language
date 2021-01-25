@@ -9,12 +9,25 @@ def main(drive):
 
     path_gen = os_utils.iterate_data(cs.BASE_DATA_PATH + cs.DATA_TRAIN_VIDEOS, ".mp4")
 
+    page = 3
+    size = 6
+
+    current = 0
+
+    start = page * size;
+    end = start + size
 
     for path in path_gen:
-        utility.write_videos(path, cs.DATA_TRAIN_VIDEOS, cs.DATA_BG_TRAIN_VIDEO, drive)
-        return;
 
-    
+        if(start <= current and current < end):
+          print('********** start excuting *********** ' + str(current))
+          utility.write_videos(path, cs.DATA_TRAIN_VIDEOS, cs.DATA_BG_TRAIN_VIDEO, drive)
+        elif(current >= end):
+          print('**********loop terminate***********')
+          break;
+        
+
+        current  = current +1
     #path_gen = os_utils.iterate_test_data(cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
     #for path in path_gen:
      #   utility.write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
