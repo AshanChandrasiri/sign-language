@@ -35,3 +35,7 @@ ENCODER1_FREEZED_PB_NAME = "encoder1_freezed.pb"
 LSTM_FREEZED_PB_NAME = "lstm_freezed.pb"
 VAE_FREEZED_PB_NAME = "vae_freezed.pb"
 OBJ_DET__PB_NAME = "frozen_inference_graph.pb"
+
+client_id = '721000894663-ioqhh0tvsdk6qoj7oegjcq9ghif8rsog.apps.googleusercontent.com'
+secret = 'srqzCL1MvOp5S_DLC3OFzosj'
+

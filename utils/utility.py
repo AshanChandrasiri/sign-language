@@ -10,8 +10,12 @@ from utils import cv_utils, os_utils
 from moviepy.editor import VideoFileClip
 from tensorflow.python.tools import freeze_graph
 from google.colab.patches import cv2_imshow
-
+#from google.colab import drive
 import random
+from google.colab import files
+
+
+
 
 def freeze_model(sess, logs_path, latest_checkpoint, model, pb_file_name, freeze_pb_file_name):
     """
@@ -268,39 +272,106 @@ def process_image(image):
 
     pic_rand = random.randint(1,100)
 
-    plt.figure(figsize=IMAGE_SIZE)
-    plt.imshow(image)
-    plt.savefig("mask/before_mask_bg_temp{0}.png".format(pic_rand))
+    #plt.figure(figsize=IMAGE_SIZE)
+    #plt.imshow(image)
+    #plt.savefig("mask/before_mask_bg_temp{0}.png".format(pic_rand))
 
    
     fg_mask = fg_bg.apply(image)
 
     
-    plt.figure(figsize=IMAGE_SIZE)
-    plt.imshow(fg_mask)
-    plt.savefig("mask/after_mask_bg_temp{0}.png".format(pic_rand))
+    #plt.figure(figsize=IMAGE_SIZE)
+    #plt.imshow(fg_mask)
+    #plt.savefig("mask/after_mask_bg_temp{0}.png".format(pic_rand))
 
     fg_mask = fg_mask[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     edged_image = edged_image[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     fg_mask[fg_mask > 0] = 255.0
     # print(fg_mask.shape)
-    fg_mask = cv2.addWeighted(fg_mask, 1, edged_image, 1, 0)
+    fg_mask = cv2.addWeighted(fg_mask, 0, edged_image, 1, 0)
     reshaped_img = cv_utils.resize(fg_mask, (500, 500))
     reshaped_img = np.dstack((reshaped_img, np.zeros_like(reshaped_img), np.zeros_like(reshaped_img)))
     # cv2_imshow(reshaped_img)
     IMAGE_SIZE = (12, 8)
-    plt.figure(figsize=IMAGE_SIZE)
-    plt.imshow(reshaped_img)
-    plt.savefig("bg_temp.png")
+    #plt.figure(figsize=IMAGE_SIZE)
+    #plt.imshow(reshaped_img)
+    #plt.savefig("bg_temp.png")
     return reshaped_img
 
 
-def write_videos(video_path, sub_str_1, sub_str_2):
+def uploadToDrive(baseFolder, subFolder,name, write_op, drive):
+
+  baseFolderFound = False
+  baseFolderId = ''
+  file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
+  for file1 in file_list:
+    #print('title: %s, id: %s' % (file1['title'], file1['id']))
+    if(file1['title'] == baseFolder):
+      baseFolderFound = True
+      baseFolderId = file1['id']
+      break
+
+  if(not baseFolderFound):
+    folder = drive.CreateFile({'title': baseFolder , 'mimeType' : 'application/vnd.google-apps.folder'})
+    folder.Upload()
+    baseFolderId = folder.get('id')
+
+  strPath = "\'" + baseFolderId + "\'" + " in parents and trashed=false"   
+  sub_folder_list = drive.ListFile({'q': strPath}).GetList()
+
+  subFolderFound = False;
+  subFolderId = ''
+  for file1 in sub_folder_list:
+    print('title: %s, id: %s' % (file1['title'], file1['id']))
+    if(file1['title'] == subFolder):
+      subFolderFound = True
+      subFolderId = file1['id']
+      break
+
+  if(not subFolderFound):
+    folder = drive.CreateFile({'title': subFolder , "parents":  [{"id": baseFolderId}], 'mimeType' : 'application/vnd.google-apps.folder'})
+    folder.Upload()
+    subFolderId = folder.get('id')
+
+  strFilePath = "\'" + subFolderId + "\'" + " in parents and trashed=false"
+  file_list = drive.ListFile({'q': strFilePath}).GetList()
+
+  fileFound = False;
+  fileId = ''
+  for file1 in file_list:
+    if(file1['title'] == name):
+      fileFound = True
+      fileId = file1['id']
+      file1.Delete()
+      break
+
+
+  uploaded = drive.CreateFile({'title': name, "parents":  [{"id": subFolderId}],})
+  uploaded.SetContentFile(write_op)
+  uploaded.Upload()
+  print('Uploaded file with ID {}'.format(uploaded.get('id')))
+
+
+
+def write_videos(video_path, sub_str_1, sub_str_2, drive):
+
     write_op = video_path.replace(sub_str_1, sub_str_2)
+    print('write ------------------')
+    print(write_op)
+
+
     raw_clip = VideoFileClip(video_path)
     bg_clip = raw_clip.fl_image(process_image)  # NOTE: this function expects color images!!
-    bg_clip.write_videofile(write_op, audio=False)
+    
+    subDir = write_op.split("/")[6]
+    fileName = write_op.split("/")[7]
 
+    fullPathDir = write_op.replace('/'+fileName, '')
+    if not os.path.exists(fullPathDir):
+       os.makedirs(fullPathDir)
+    
+    bg_clip.write_videofile(write_op, audio=False)
+    uploadToDrive('train', subDir, fileName, write_op, drive)
 
 def read_video(video_path):
     video = imageio.get_reader(video_path, 'ffmpeg')
