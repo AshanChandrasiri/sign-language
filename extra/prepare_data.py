@@ -12,7 +12,7 @@ def main(drive):
     page = 3
     size = 6
 
-    current = 0
+    current = 0 
 
     start = page * size;
     end = start + size
