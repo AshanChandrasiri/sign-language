@@ -49,7 +49,8 @@ def get_batch(video_path):
 
 
 def display_reconstruction_results(test_frame, reconstructed):
-    fig, axes = plt.subplots(nrows=2, ncols=10, sharex=True, sharey=True, figsize=(20, 4))
+    fig, axes = plt.subplots(
+        nrows=2, ncols=10, sharex=True, sharey=True, figsize=(20, 4))
 
     for images, row in zip([test_frame, reconstructed], axes):
         for img, ax in zip(images, row):
@@ -96,7 +97,8 @@ def train():
 
     epochs = 150  # epochs: Number of iterations for which training will be performed
     loading = False  # loading : flag for loading an already trained model
-    logs_path = cs.BASE_LOG_PATH + cs.MODEL_CONV_AE_1  # logs_path : path to store checkpoint and summary events
+    # logs_path : path to store checkpoint and summary events
+    logs_path = cs.BASE_LOG_PATH + cs.MODEL_CONV_AE_1
     tf.reset_default_graph()
     cae = ConVAE()
     cae.build_model()
@@ -126,7 +128,8 @@ def train():
 
     for e in tqdm(range(checkpoint_number, checkpoint_number+epochs)):
         print()
-        path_generator = os_utils.iterate_data(cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
+        path_generator = os_utils.iterate_data(
+            cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
         batch_counter = 0
         start_time = time.time()
 
@@ -151,7 +154,8 @@ def train():
             # ==============================
             # Write logs at every iteration
             # ==============================
-            summary_writer.add_summary(summary, checkpoint_number + loop_counter)
+            summary_writer.add_summary(
+                summary, checkpoint_number + loop_counter)
 
             print("Epoch: {}/{}...".format(e+1-checkpoint_number, epochs),
                   "Training loss: {:.4f}".format(batch_loss))
@@ -165,15 +169,19 @@ def train():
             loop_counter += 1
             if batch_counter == 420:
                 end_time = time.time()
-                print("==============================================================================================")
-                print("Epoch Number", e, "has ended in", end_time-start_time, "seconds for", batch_counter, "videos")
-                print("==============================================================================================")
+                print(
+                    "==============================================================================================")
+                print("Epoch Number", e, "has ended in", end_time -
+                      start_time, "seconds for", batch_counter, "videos")
+                print(
+                    "==============================================================================================")
 
                 # break
 
         if e % 10 == 0:
             print("################################################")
-            print("saving the model at epoch", checkpoint_number + loop_counter)
+            print("saving the model at epoch",
+                  checkpoint_number + loop_counter)
             print("################################################")
 
             saver.save(sess, os.path.join(logs_path, 'encoder_epoch_number_{}.ckpt'
@@ -188,7 +196,8 @@ def train():
     print("Run the command line:\n--> tensorboard --logdir={}".format(logs_path),
           "\nThen open http://0.0.0.0:6006/ into your web browser")
 
-    path_generator = os_utils.iterate_test_data(cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
+    path_generator = os_utils.iterate_test_data(
+        cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
 
     # ==============================================================
     # Now testing the performance of our model on an unknown data
@@ -199,7 +208,8 @@ def train():
         if test_frame is not None:
 
             test_frame = test_frame[20:40, :, :, :]
-            reconstructed = sess.run(cae.decoded, feed_dict={cae.inputs_: test_frame})
+            reconstructed = sess.run(cae.decoded, feed_dict={
+                                     cae.inputs_: test_frame})
             display_reconstruction_results(test_frame, reconstructed)
 
             break
@@ -214,4 +224,3 @@ if __name__ == '__main__':
     print("===================================================")
     print("Total Execution Time =", total_end_time - total_start_time)
     print("===================================================")
-

@@ -18,6 +18,7 @@ gauth = GoogleAuth()
 gauth.credentials = GoogleCredentials.get_application_default()
 drive = GoogleDrive(gauth)
 
+print('start excutioon--------------')
 prepare_data.main(drive)
 
 #file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
