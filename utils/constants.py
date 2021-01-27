@@ -4,7 +4,7 @@ SLASH = "/"
 # ==========================
 #  All Path constants
 # ==========================
-BASE_PROJECT_PATH = "/content/sign-language/"
+BASE_PROJECT_PATH = "/content/drive/MyDrive/"
 BASE_DATA_PATH = BASE_PROJECT_PATH+"data/"
 BASE_LOG_PATH = BASE_PROJECT_PATH+"saved_models/"
 

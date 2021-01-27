@@ -15,8 +15,6 @@ import random
 from google.colab import files
 
 
-
-
 def freeze_model(sess, logs_path, latest_checkpoint, model, pb_file_name, freeze_pb_file_name):
     """
     :param sess     : tensor-flow session instance which creates the all graph information
@@ -71,8 +69,10 @@ def prepare_batch_frames(video_path):
         edged_image = cv_utils.apply_canny(frame, 50, 150)
         rect_pts = detect_person(frame)
         fg_mask = fg_bg.apply(frame)
-        fg_mask = fg_mask[int(rect_pts[0]): int(rect_pts[2]-120), int(rect_pts[1]): int(rect_pts[3]-50)]
-        edged_image = edged_image[int(rect_pts[0]): int(rect_pts[2]-120), int(rect_pts[1]): int(rect_pts[3]-50)]
+        fg_mask = fg_mask[int(rect_pts[0]): int(
+            rect_pts[2]-120), int(rect_pts[1]): int(rect_pts[3]-50)]
+        edged_image = edged_image[int(rect_pts[0]): int(
+            rect_pts[2]-120), int(rect_pts[1]): int(rect_pts[3]-50)]
         fg_mask[fg_mask > 0] = 255.0
         print(fg_mask.shape)
         fg_mask = cv2.addWeighted(fg_mask, 1, edged_image, 1, 0)
@@ -132,7 +132,8 @@ def prepare_batch_frames_from_bg_data(video_path, frame_limit=109, resize=(240, 
         red_channel = red_channel.reshape((1, resize[0], resize[1]))
         frame_batch = np.vstack((frame_batch, red_channel))
 
-    frame_batch = frame_batch.reshape(frame_batch.shape[0], resize[0], resize[1], 1)
+    frame_batch = frame_batch.reshape(
+        frame_batch.shape[0], resize[0], resize[1], 1)
     frame_batch = frame_batch[2:, :, :, :]
 
     return frame_batch
@@ -192,7 +193,8 @@ def reframe_box_masks_to_image_masks(box_masks, boxes, image_height, image_width
     image_masks = tf.image.crop_and_resize(image=box_masks,
                                            boxes=reverse_boxes,
                                            box_ind=tf.range(num_boxes),
-                                           crop_size=[image_height, image_width],
+                                           crop_size=[
+                                               image_height, image_width],
                                            extrapolation_value=0.0)
     return tf.squeeze(image_masks, axis=3)
 
@@ -202,7 +204,8 @@ def run_inference_for_single_image(image, graph):
         with tf.Session() as sess:
             # Get handles to input and output tensors
             ops = tf.get_default_graph().get_operations()
-            all_tensor_names = {output.name for op in ops for output in op.outputs}
+            all_tensor_names = {
+                output.name for op in ops for output in op.outputs}
             tensor_dict = {}
             for key in [
                 'num_detections', 'detection_boxes', 'detection_scores',
@@ -214,12 +217,17 @@ def run_inference_for_single_image(image, graph):
                         tensor_name)
             if 'detection_masks' in tensor_dict:
                 # The following processing is only for single image
-                detection_boxes = tf.squeeze(tensor_dict['detection_boxes'], [0])
-                detection_masks = tf.squeeze(tensor_dict['detection_masks'], [0])
+                detection_boxes = tf.squeeze(
+                    tensor_dict['detection_boxes'], [0])
+                detection_masks = tf.squeeze(
+                    tensor_dict['detection_masks'], [0])
                 # Reframe is required to translate mask from box coordinates to image coordinates and fit image size.
-                real_num_detection = tf.cast(tensor_dict['num_detections'][0], tf.int32)
-                detection_boxes = tf.slice(detection_boxes, [0, 0], [real_num_detection, -1])
-                detection_masks = tf.slice(detection_masks, [0, 0, 0], [real_num_detection, -1, -1])
+                real_num_detection = tf.cast(
+                    tensor_dict['num_detections'][0], tf.int32)
+                detection_boxes = tf.slice(detection_boxes, [0, 0], [
+                                           real_num_detection, -1])
+                detection_masks = tf.slice(detection_masks, [0, 0, 0], [
+                                           real_num_detection, -1, -1])
                 detection_masks_reframed = reframe_box_masks_to_image_masks(
                     detection_masks, detection_boxes, image.shape[0], image.shape[1])
                 detection_masks_reframed = tf.cast(
@@ -234,7 +242,8 @@ def run_inference_for_single_image(image, graph):
                                    feed_dict={image_tensor: np.expand_dims(image, 0)})
 
             # all outputs are float32 numpy arrays, so convert types as appropriate
-            output_dict['num_detections'] = int(output_dict['num_detections'][0])
+            output_dict['num_detections'] = int(
+                output_dict['num_detections'][0])
             output_dict['detection_classes'] = output_dict[
                 'detection_classes'][0].astype(np.uint8)
             output_dict['detection_boxes'] = output_dict['detection_boxes'][0]
@@ -248,20 +257,24 @@ def detect_person(image):
     print("**********************************")
     print("printing image")
     # cv2_imshow(image)
-    path_to_ckpt = cs.BASE_LOG_PATH+cs.MODEL_SSD+cs.OBJ_DET__PB_NAME
-    output_dict = run_inference_for_single_image(image, load_a_frozen_model(path_to_ckpt))
+    path_to_ckpt = '/content/sign-language/saved_models/ssd_mobilenet/frozen_inference_graph.pb'
+    output_dict = run_inference_for_single_image(
+        image, load_a_frozen_model(path_to_ckpt))
     boxes = output_dict['detection_boxes']
-    rectangle_pts = boxes[0, :] * np.array([image.shape[0], image.shape[1], image.shape[0], image.shape[1]])
-    image = image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])]
+    rectangle_pts = boxes[0, :] * np.array(
+        [image.shape[0], image.shape[1], image.shape[0], image.shape[1]])
+    image = image[int(rectangle_pts[0]): int(rectangle_pts[2]),
+                  int(rectangle_pts[1]): int(rectangle_pts[3])]
     IMAGE_SIZE = (12, 8)
     plt.figure(figsize=IMAGE_SIZE)
-    plt.imshow(image[int(rectangle_pts[0]): int(rectangle_pts[2]), int(rectangle_pts[1]): int(rectangle_pts[3])])
+    plt.imshow(image[int(rectangle_pts[0]): int(rectangle_pts[2]),
+                     int(rectangle_pts[1]): int(rectangle_pts[3])])
     plt.savefig("temp.png")
     return rectangle_pts
 
 
 def process_image(image):
-  
+
     edged_image = cv_utils.apply_canny(image, 50, 150)
     rect_pts = detect_person(image)
     print("**********************************")
@@ -270,87 +283,90 @@ def process_image(image):
     fg_bg = cv2.createBackgroundSubtractorMOG2()
     IMAGE_SIZE = (12, 8)
 
-    pic_rand = random.randint(1,100)
+    pic_rand = random.randint(1, 100)
 
-    #plt.figure(figsize=IMAGE_SIZE)
-    #plt.imshow(image)
-    #plt.savefig("mask/before_mask_bg_temp{0}.png".format(pic_rand))
+    # plt.figure(figsize=IMAGE_SIZE)
+    # plt.imshow(image)
+    # plt.savefig("mask/before_mask_bg_temp{0}.png".format(pic_rand))
 
-   
     fg_mask = fg_bg.apply(image)
 
-    
-    #plt.figure(figsize=IMAGE_SIZE)
-    #plt.imshow(fg_mask)
-    #plt.savefig("mask/after_mask_bg_temp{0}.png".format(pic_rand))
+    # plt.figure(figsize=IMAGE_SIZE)
+    # plt.imshow(fg_mask)
+    # plt.savefig("mask/after_mask_bg_temp{0}.png".format(pic_rand))
 
-    fg_mask = fg_mask[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
-    edged_image = edged_image[int(rect_pts[0]): int(rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
+    fg_mask = fg_mask[int(rect_pts[0]): int(
+        rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
+    edged_image = edged_image[int(rect_pts[0]): int(
+        rect_pts[2] - 120), int(rect_pts[1]): int(rect_pts[3] - 50)]
     fg_mask[fg_mask > 0] = 255.0
     # print(fg_mask.shape)
     fg_mask = cv2.addWeighted(fg_mask, 0, edged_image, 1, 0)
     reshaped_img = cv_utils.resize(fg_mask, (500, 500))
-    reshaped_img = np.dstack((reshaped_img, np.zeros_like(reshaped_img), np.zeros_like(reshaped_img)))
+    reshaped_img = np.dstack((reshaped_img, np.zeros_like(
+        reshaped_img), np.zeros_like(reshaped_img)))
     # cv2_imshow(reshaped_img)
     IMAGE_SIZE = (12, 8)
-    #plt.figure(figsize=IMAGE_SIZE)
-    #plt.imshow(reshaped_img)
-    #plt.savefig("bg_temp.png")
+    # plt.figure(figsize=IMAGE_SIZE)
+    # plt.imshow(reshaped_img)
+    # plt.savefig("bg_temp.png")
     return reshaped_img
 
 
-def uploadToDrive(baseFolder, subFolder,name, write_op, drive):
+def uploadToDrive(baseFolder, subFolder, name, write_op, drive):
 
-  baseFolderFound = False
-  baseFolderId = ''
-  file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
-  for file1 in file_list:
-    #print('title: %s, id: %s' % (file1['title'], file1['id']))
-    if(file1['title'] == baseFolder):
-      baseFolderFound = True
-      baseFolderId = file1['id']
-      break
+    baseFolderFound = False
+    baseFolderId = ''
+    file_list = drive.ListFile(
+        {'q': "'root' in parents and trashed=false"}).GetList()
+    for file1 in file_list:
+        #print('title: %s, id: %s' % (file1['title'], file1['id']))
+        if(file1['title'] == baseFolder):
+            baseFolderFound = True
+            baseFolderId = file1['id']
+            break
 
-  if(not baseFolderFound):
-    folder = drive.CreateFile({'title': baseFolder , 'mimeType' : 'application/vnd.google-apps.folder'})
-    folder.Upload()
-    baseFolderId = folder.get('id')
+    if(not baseFolderFound):
+        folder = drive.CreateFile(
+            {'title': baseFolder, 'mimeType': 'application/vnd.google-apps.folder'})
+        folder.Upload()
+        baseFolderId = folder.get('id')
 
-  strPath = "\'" + baseFolderId + "\'" + " in parents and trashed=false"   
-  sub_folder_list = drive.ListFile({'q': strPath}).GetList()
+    strPath = "\'" + baseFolderId + "\'" + " in parents and trashed=false"
+    sub_folder_list = drive.ListFile({'q': strPath}).GetList()
 
-  subFolderFound = False;
-  subFolderId = ''
-  for file1 in sub_folder_list:
-    print('title: %s, id: %s' % (file1['title'], file1['id']))
-    if(file1['title'] == subFolder):
-      subFolderFound = True
-      subFolderId = file1['id']
-      break
+    subFolderFound = False
+    subFolderId = ''
+    for file1 in sub_folder_list:
+        print('title: %s, id: %s' % (file1['title'], file1['id']))
+        if(file1['title'] == subFolder):
+            subFolderFound = True
+            subFolderId = file1['id']
+            break
 
-  if(not subFolderFound):
-    folder = drive.CreateFile({'title': subFolder , "parents":  [{"id": baseFolderId}], 'mimeType' : 'application/vnd.google-apps.folder'})
-    folder.Upload()
-    subFolderId = folder.get('id')
+    if(not subFolderFound):
+        folder = drive.CreateFile({'title': subFolder, "parents":  [
+                                  {"id": baseFolderId}], 'mimeType': 'application/vnd.google-apps.folder'})
+        folder.Upload()
+        subFolderId = folder.get('id')
 
-  strFilePath = "\'" + subFolderId + "\'" + " in parents and trashed=false"
-  file_list = drive.ListFile({'q': strFilePath}).GetList()
+    strFilePath = "\'" + subFolderId + "\'" + " in parents and trashed=false"
+    file_list = drive.ListFile({'q': strFilePath}).GetList()
 
-  fileFound = False;
-  fileId = ''
-  for file1 in file_list:
-    if(file1['title'] == name):
-      fileFound = True
-      fileId = file1['id']
-      file1.Delete()
-      break
+    fileFound = False
+    fileId = ''
+    for file1 in file_list:
+        if(file1['title'] == name):
+            fileFound = True
+            fileId = file1['id']
+            file1.Delete()
+            break
 
-
-  uploaded = drive.CreateFile({'title': name, "parents":  [{"id": subFolderId}],})
-  uploaded.SetContentFile(write_op)
-  uploaded.Upload()
-  print('Uploaded file with ID {}'.format(uploaded.get('id')))
-
+    uploaded = drive.CreateFile(
+        {'title': name, "parents":  [{"id": subFolderId}], })
+    uploaded.SetContentFile(write_op)
+    uploaded.Upload()
+    print('Uploaded file with ID {}'.format(uploaded.get('id')))
 
 
 def write_videos(video_path, sub_str_1, sub_str_2, drive):
@@ -359,19 +375,29 @@ def write_videos(video_path, sub_str_1, sub_str_2, drive):
     print('write ------------------')
     print(write_op)
 
-
     raw_clip = VideoFileClip(video_path)
-    bg_clip = raw_clip.fl_image(process_image)  # NOTE: this function expects color images!!
-    
-    subDir = write_op.split("/")[6]
-    fileName = write_op.split("/")[7]
 
-    fullPathDir = write_op.replace('/'+fileName, '')
-    if not os.path.exists(fullPathDir):
-       os.makedirs(fullPathDir)
-    
-    bg_clip.write_videofile(write_op, audio=False)
-    uploadToDrive('train', subDir, fileName, write_op, drive)
+    try:
+        # NOTE: this function expects color images!!
+        bg_clip = raw_clip.fl_image(process_image)
+
+        subDir = write_op.split("/")[7]
+        fileName = write_op.split("/")[8]
+
+        fullPathDir = write_op.replace('/'+fileName, '')
+
+        if not os.path.exists(fullPathDir):
+            os.makedirs(fullPathDir)
+
+        bg_clip.write_videofile(write_op, audio=False)
+
+    except Exception as e:
+        print('-----------exception occured------------')
+        print('------ file : ' + write_op)
+        print(e)
+
+    #uploadToDrive('train', subDir, fileName, write_op, drive)
+
 
 def read_video(video_path):
     video = imageio.get_reader(video_path, 'ffmpeg')
@@ -389,9 +415,11 @@ def maxpool_stride_layer(x, filter_w, s):
 
 
 def conv_layer(x, filter_w, in_d, out_d, is_relu, mu=0.0, sigma=0.1):
-    conv_w = tf.Variable(tf.truncated_normal(shape=(filter_w, filter_w, in_d, out_d), mean=mu, stddev=sigma))
+    conv_w = tf.Variable(tf.truncated_normal(
+        shape=(filter_w, filter_w, in_d, out_d), mean=mu, stddev=sigma))
     conv_b = tf.Variable(tf.zeros(out_d))
-    conv_res = tf.nn.conv2d(x, conv_w, strides=[1, 1, 1, 1], padding='SAME') + conv_b
+    conv_res = tf.nn.conv2d(
+        x, conv_w, strides=[1, 1, 1, 1], padding='SAME') + conv_b
     if is_relu:
         return tf.nn.leaky_relu(conv_res)
     else:
@@ -424,8 +452,7 @@ if __name__ == '__main__':
     # for path in path_gen:
     #     write_videos(path, cs.DATA_TRAIN_VIDEOS, cs.DATA_BG_TRAIN_VIDEO)
 
-    path_gen = os_utils.iterate_test_data(cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
+    path_gen = os_utils.iterate_test_data(
+        cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
     for path in path_gen:
         write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
-
-
