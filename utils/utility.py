@@ -376,17 +376,26 @@ def write_videos(video_path, sub_str_1, sub_str_2, drive):
     print(write_op)
 
     raw_clip = VideoFileClip(video_path)
-    # NOTE: this function expects color images!!
-    bg_clip = raw_clip.fl_image(process_image)
 
-    subDir = write_op.split("/")[7]
-    fileName = write_op.split("/")[8]
+    try:
+        # NOTE: this function expects color images!!
+        bg_clip = raw_clip.fl_image(process_image)
 
-    fullPathDir = write_op.replace('/'+fileName, '')
-    if not os.path.exists(fullPathDir):
-        os.makedirs(fullPathDir)
+        subDir = write_op.split("/")[7]
+        fileName = write_op.split("/")[8]
 
-    bg_clip.write_videofile(write_op, audio=False)
+        fullPathDir = write_op.replace('/'+fileName, '')
+
+        if not os.path.exists(fullPathDir):
+            os.makedirs(fullPathDir)
+
+        bg_clip.write_videofile(write_op, audio=False)
+
+    except Exception as e:
+        print('-----------exception occured------------')
+        print('------ file : ' + write_op)
+        print(e)
+
     #uploadToDrive('train', subDir, fileName, write_op, drive)
 
 

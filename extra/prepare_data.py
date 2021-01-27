@@ -10,8 +10,8 @@ def main(drive):
     path_gen = os_utils.iterate_data(
         cs.BASE_DATA_PATH + cs.DATA_TRAIN_VIDEOS, ".mp4")
 
-    page = 0
-    size = 1
+    page = 2
+    size = 12
 
     current = 0
 
