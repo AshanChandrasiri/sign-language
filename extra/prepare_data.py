@@ -29,9 +29,25 @@ def main(drive):
             break
 
         current = current + 1
-    #path_gen = os_utils.iterate_test_data(cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
-    # for path in path_gen:
-        # utility.write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
+
+    testStart = page * size
+    testEnd = start + size
+    testCurrent = 0
+
+    path_gen = os_utils.iterate_test_data(
+        cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
+    for path in path_gen:
+
+        if(testStart <= testCurrent and testCurrent < end):
+            print('********** start excuting *********** ' + str(testCurrent))
+            utility.write_videos(path, cs.DATA_TEST_VIDEOS,
+                                 cs.DATA_BG_TEST_VIDEO)
+        elif(testCurrent >= testEnd):
+            print('**********loop terminate***********')
+            break
+
+        testCurrent = testCurrent + 1
+        utility.write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
 
 # if __name__ == '__main__':
 #     fg_bg = cv2.createBackgroundSubtractorMOG2()
