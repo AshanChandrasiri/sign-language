@@ -1,6 +1,6 @@
 #from google.colab import drive
 from extra import prepare_data
-
+from core import train_auto_enocder_1
 # drive.mount('/content/sign-language/drive')
 
 
@@ -20,7 +20,7 @@ drive = GoogleDrive(gauth)
 
 print('start excutioon--------------')
 prepare_data.main(drive)
-
+#train_auto_enocder_1.mainf()
 #file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
 # for file1 in file_list:
 #  print('title: %s, id: %s' % (file1['title'], file1['id']))

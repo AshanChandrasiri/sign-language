@@ -125,9 +125,9 @@ def prepare_batch_frames_from_bg_data(video_path, frame_limit=109, resize=(240, 
         red_channel = cv_utils.resize(red_channel, resize)
         red_channel[red_channel > 0] == 255.0
         red_channel = red_channel / 255.0
-        cv2.imshow("bg_subtraction", red_channel)
-        if cv2.waitKey(25) & 0xFF == ord('q'):
-            break
+        #cv2.imshow("bg_subtraction", red_channel)
+        #if cv2.waitKey(25) & 0xFF == ord('q'):
+         #   break
 
         red_channel = red_channel.reshape((1, resize[0], resize[1]))
         frame_batch = np.vstack((frame_batch, red_channel))

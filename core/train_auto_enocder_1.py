@@ -143,6 +143,8 @@ def train():
                 continue
 
             else:
+                print(
+                    "********************************************************************************")
                 print("video_path", video_path)
                 print("video number =", batch_counter, "..... batch_x.shape", batch_x.shape,
                       " loop_counter =", checkpoint_number + loop_counter)
@@ -215,6 +217,15 @@ def train():
             break
 
     sess.close()
+
+
+def mainf():
+    total_start_time = time.time()
+    train()
+    total_end_time = time.time()
+    print("===================================================")
+    print("Total Execution Time =", total_end_time - total_start_time)
+    print("===================================================")
 
 
 if __name__ == '__main__':

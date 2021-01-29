@@ -10,8 +10,8 @@ def main(drive):
     path_gen = os_utils.iterate_data(
         cs.BASE_DATA_PATH + cs.DATA_TRAIN_VIDEOS, ".mp4")
 
-    page = 2
-    size = 12
+    page = 1
+    size = 30
 
     current = 0
 
@@ -31,7 +31,7 @@ def main(drive):
         current = current + 1
     #path_gen = os_utils.iterate_test_data(cs.BASE_DATA_PATH + cs.DATA_TEST_VIDEOS, ".mp4")
     # for path in path_gen:
-       #   utility.write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
+        # utility.write_videos(path, cs.DATA_TEST_VIDEOS, cs.DATA_BG_TEST_VIDEO)
 
 # if __name__ == '__main__':
 #     fg_bg = cv2.createBackgroundSubtractorMOG2()
