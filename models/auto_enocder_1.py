@@ -80,6 +80,7 @@ class ConvAutoEncoder1(object):
             self.nodes = [conv1.name, inception_1.name, maxpool1.name, inception_2.name,
                           maxpool2.name, inception_3.name, maxpool3.name, encoded.name]
 
+# check the summry print
             if self.summary:
                 print(conv1.name, "=", conv1.shape)
                 print(inception_1.name, "=", inception_1.shape)
