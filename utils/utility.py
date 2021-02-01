@@ -398,6 +398,33 @@ def write_videos(video_path, sub_str_1, sub_str_2, drive):
 
     #uploadToDrive('train', subDir, fileName, write_op, drive)
 
+def write_test_videos(video_path, sub_str_1, sub_str_2, drive):
+
+    write_op = video_path.replace(sub_str_1, sub_str_2)
+    print('write ------------------')
+    print(write_op)
+
+    raw_clip = VideoFileClip(video_path)
+
+    try:
+      
+        # NOTE: this function expects color images!!
+      bg_clip = raw_clip.fl_image(process_image)
+
+      #subDir = write_op.split("/")[7]
+      #fileName = write_op.split("/")[8]
+
+      #fullPathDir = write_op.replace('/'+fileName, '')
+
+        #if not os.path.exists(fullPathDir):
+        #    os.makedirs(fullPathDir)
+
+      bg_clip.write_videofile(write_op, audio=False)
+
+    except Exception as e:
+        print('-----------exception occured------------')
+        print('------ file : ' + write_op)
+        print(e)
 
 def read_video(video_path):
     video = imageio.get_reader(video_path, 'ffmpeg')

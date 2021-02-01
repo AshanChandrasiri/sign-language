@@ -68,8 +68,13 @@ def get_encoded_embeddings(logs_path):
     tf.import_graph_def(graph_def, name='')
 
     detection_graph = tf.get_default_graph()
+
+    for op in detection_graph.get_operations():
+      print('************* graph operatin -------------------')
+      print(op.name)
+
     x = detection_graph.get_tensor_by_name('inputs:0')
-    encoded = detection_graph.get_tensor_by_name('encoder/encoded/LeakyRelu/Maximum:0')
+    encoded = detection_graph.get_tensor_by_name('encoder/encoded/LeakyRelu:0')
 
     # embedding = sess.run(encoded, feed_dict={x: frame})
     # embedding = embedding.reshape((1, / len(sampling_list)embedding.shape[0], embedding.shape[1]))
@@ -92,6 +97,7 @@ def write_summaries(validation_acc, loss):
 
 
 def train():
+    BATCH_SIZE = 1
     epochs = 51
     sampling_number = 70
     encoder_logs_path = cs.BASE_LOG_PATH + cs.MODEL_CONV_AE_1
@@ -184,8 +190,8 @@ def train():
                 batch_counter += 1
                 loop_counter += 1
 
-                if batch_counter == 420:
-                    total_loss = total_loss / 420
+                if batch_counter == 150:
+                    total_loss = total_loss / 150
                     end_time = time.time()
                     print("===========================================================================================")
                     print("Epoch Number", e, "has ended in", end_time - start_time, "seconds for", batch_counter,
@@ -216,6 +222,14 @@ def train():
 
     sess.close()
 
+def mainf():
+    total_start_time = time.time()
+    BATCH_SIZE = 1
+    train()
+    total_end_time = time.time()
+    print("===================================================")
+    print("Total Execution Time =", total_end_time - total_start_time)
+    print("===================================================")
 
 if __name__ == "__main__":
     total_start_time = time.time()
