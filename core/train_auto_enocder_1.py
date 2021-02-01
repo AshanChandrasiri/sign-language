@@ -169,7 +169,7 @@ def train():
 
             batch_counter += 1
             loop_counter += 1
-            if batch_counter == 420:
+            if batch_counter == 150:
                 end_time = time.time()
                 print(
                     "==============================================================================================")

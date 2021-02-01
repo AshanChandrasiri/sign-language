@@ -1,6 +1,8 @@
 #from google.colab import drive
 from extra import prepare_data
 from core import train_auto_enocder_1
+from core import train_bi_lstm
+from core import test_bi_lstm
 # drive.mount('/content/sign-language/drive')
 
 
@@ -19,8 +21,13 @@ gauth.credentials = GoogleCredentials.get_application_default()
 drive = GoogleDrive(gauth)
 
 print('start excutioon--------------')
-prepare_data.main(drive)
-#train_auto_enocder_1.mainf()
+# prepare_data.main(drive)
+# train_auto_enocder_1.mainf()
+
+# train_bi_lstm.mainf()
+
+test_bi_lstm.mainf()
+
 #file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
 # for file1 in file_list:
 #  print('title: %s, id: %s' % (file1['title'], file1['id']))
