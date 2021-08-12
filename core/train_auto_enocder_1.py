@@ -198,6 +198,8 @@ def train():
     print("Run the command line:\n--> tensorboard --logdir={}".format(logs_path),
           "\nThen open http://0.0.0.0:6006/ into your web browser")
 
+    # path_generator = os_utils.iterate_test_data(
+    #     cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
     path_generator = os_utils.iterate_test_data(
         cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
 

@@ -4,9 +4,13 @@ SLASH = "/"
 # ==========================
 #  All Path constants
 # ==========================
+# BASE_PROJECT_PATH = "/content/drive/MyDrive/"
+# BASE_DATA_PATH = BASE_PROJECT_PATH+"data/"
+# BASE_LOG_PATH = BASE_PROJECT_PATH+"saved_models/"
+
 BASE_PROJECT_PATH = "/content/drive/MyDrive/"
-BASE_DATA_PATH = BASE_PROJECT_PATH+"data/"
-BASE_LOG_PATH = BASE_PROJECT_PATH+"saved_models/"
+BASE_DATA_PATH = BASE_PROJECT_PATH+"data-holistic/"
+BASE_LOG_PATH = BASE_PROJECT_PATH+"saved_models-holistic/"
 
 # =====================
 #  DATA Relative Path
@@ -38,4 +42,3 @@ OBJ_DET__PB_NAME = "frozen_inference_graph.pb"
 
 client_id = '721000894663-ioqhh0tvsdk6qoj7oegjcq9ghif8rsog.apps.googleusercontent.com'
 secret = 'srqzCL1MvOp5S_DLC3OFzosj'
-
