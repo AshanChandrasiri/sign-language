@@ -216,7 +216,7 @@ def train():
     print("Run the command line:\n--> tensorboard --logdir={}".format(logs_path),
           "\nThen open http://0.0.0.0:6006/ into your web browser")
 
-    rnn.process_node_names()
+    # rnn.process_node_names()
     utility.freeze_model(sess, logs_path, tf.train.latest_checkpoint(logs_path),
                          rnn, "lstm_train.pb", cs.LSTM_FREEZED_PB_NAME)
 

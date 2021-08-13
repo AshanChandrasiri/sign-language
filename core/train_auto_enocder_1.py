@@ -191,7 +191,7 @@ def train():
     # =========================
     # Freeze the session graph
     # =========================
-    cae.process_node_names()
+    # cae.process_node_names()
     utility.freeze_model(sess, logs_path, tf.train.latest_checkpoint(logs_path),
                          cae, "encoder_train.pb", cs.ENCODER1_FREEZED_PB_NAME)
 
