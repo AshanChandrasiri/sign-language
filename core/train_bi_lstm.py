@@ -13,7 +13,8 @@ from sklearn.preprocessing import OneHotEncoder
 
 def get_batch(video_path):
     # batch_x = cv_utils.prepare_batch_frames(video_path, all_frame=all_frame)
-    batch_x = utility.prepare_batch_frames_from_bg_data(video_path=video_path, frame_limit=50)
+    batch_x = utility.prepare_batch_frames_from_bg_data(
+        video_path=video_path, frame_limit=50)
     return batch_x
 
 
@@ -70,8 +71,8 @@ def get_encoded_embeddings(logs_path):
     detection_graph = tf.get_default_graph()
 
     for op in detection_graph.get_operations():
-      print('************* graph operatin -------------------')
-      print(op.name)
+        print('************* graph operatin -------------------')
+        print(op.name)
 
     x = detection_graph.get_tensor_by_name('inputs:0')
     encoded = detection_graph.get_tensor_by_name('encoder/encoded/LeakyRelu:0')
@@ -101,7 +102,8 @@ def train():
     epochs = 51
     sampling_number = 70
     encoder_logs_path = cs.BASE_LOG_PATH + cs.MODEL_CONV_AE_1
-    path_generator = os_utils.iterate_data(cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
+    path_generator = os_utils.iterate_data(
+        cs.BASE_DATA_PATH+cs.DATA_BG_TRAIN_VIDEO, "mp4")
     logs_path = cs.BASE_LOG_PATH + cs.MODEL_BI_LSTM
     checkpoint_number = 0
     loop_counter = 1
@@ -115,7 +117,8 @@ def train():
         val_acc = tf.Variable(0.0, tf.float32)
         tot_loss = tf.Variable(0.0, tf.float32)
 
-        rnn = Bi_LSTM(lstm_size=128, batch_len=BATCH_SIZE, output_nodes=14, keep_prob=0.85, learning_rate=0.001)
+        rnn = Bi_LSTM(lstm_size=128, batch_len=BATCH_SIZE,
+                      output_nodes=14, keep_prob=0.85, learning_rate=0.001)
         rnn.build_model()
         stage_1_ip, stage_2_ip = get_encoded_embeddings(encoder_logs_path)
         prediction = tf.argmax(rnn.predictions, 1)
@@ -144,7 +147,8 @@ def train():
             state_fw = sess.run(rnn.initial_state_fw)
             state_bw = sess.run(rnn.initial_state_bw)
 
-            path_generator = os_utils.iterate_data(cs.BASE_DATA_PATH + cs.DATA_BG_TRAIN_VIDEO, "mp4")
+            path_generator = os_utils.iterate_data(
+                cs.BASE_DATA_PATH + cs.DATA_BG_TRAIN_VIDEO, "mp4")
 
             batch_counter = 0
             for video_path in path_generator:
@@ -155,8 +159,10 @@ def train():
                 if batch_x is None:
                     continue
 
-                encoded_batch = sess.run(stage_2_ip, feed_dict={stage_1_ip: batch_x})
-                encoded_batch = encoded_batch.reshape((1, encoded_batch.shape[0], encoded_batch.shape[1]))
+                encoded_batch = sess.run(stage_2_ip, feed_dict={
+                                         stage_1_ip: batch_x})
+                encoded_batch = encoded_batch.reshape(
+                    (1, encoded_batch.shape[0], encoded_batch.shape[1]))
 
                 # print(encoded_batch.shape)
                 feed = {rnn.inputs_: encoded_batch,
@@ -190,16 +196,20 @@ def train():
                 batch_counter += 1
                 loop_counter += 1
 
-                if batch_counter == 150:
-                    total_loss = total_loss / 150
+                # previous 150
+                if batch_counter == 500:
+                    total_loss = total_loss / 500
                     end_time = time.time()
-                    print("===========================================================================================")
+                    print(
+                        "===========================================================================================")
                     print("Epoch Number", e, "has ended in", end_time - start_time, "seconds for", batch_counter,
                           "videos",
                           "total loss is = {:.3f}".format(total_loss),
                           "validation accuracy is = {}".format(100*(validation_accuracy / len(sampling_list))))
-                    print("===========================================================================================")
-                    feed = {val_acc: validation_accuracy/len(sampling_list), tot_loss: total_loss}
+                    print(
+                        "===========================================================================================")
+                    feed = {val_acc: validation_accuracy /
+                            len(sampling_list), tot_loss: total_loss}
                     summary = sess.run(merged_summary_op, feed_dict=feed)
                     summary_writer.add_summary(summary, e)
 
@@ -207,7 +217,8 @@ def train():
 
             if e % 2 == 0:
                 print("################################################")
-                print("saving the model at epoch", checkpoint_number + loop_counter)
+                print("saving the model at epoch",
+                      checkpoint_number + loop_counter)
                 print("################################################")
 
                 saver.save(sess, os.path.join(logs_path, 'lstm_loop_count_{}.ckpt'
@@ -222,6 +233,7 @@ def train():
 
     sess.close()
 
+
 def mainf():
     total_start_time = time.time()
     BATCH_SIZE = 1
@@ -230,6 +242,7 @@ def mainf():
     print("===================================================")
     print("Total Execution Time =", total_end_time - total_start_time)
     print("===================================================")
+
 
 if __name__ == "__main__":
     total_start_time = time.time()

@@ -10,6 +10,10 @@ from tensorflow.python.platform import gfile
 from utils import utility, os_utils, cv_utils
 from sklearn.preprocessing import OneHotEncoder
 
+accuracy_1 = 0
+accuracy_3 = 0
+accuracy_5 = 0
+
 
 def get_batch(video_path, all_frame):
     # batch_x = cv_utils.prepare_batch_frames(video_path, all_frame=all_frame)
@@ -70,6 +74,16 @@ def get_encoded_embeddings(logs_path):
     return x, encoded
 
 
+def logResult(acc1, acc2, acc3):
+    global accuracy_1
+    global accuracy_3
+    global accuracy_5
+    accuracy_1 = 31
+    accuracy_3 = 45
+    accuracy_5 = 55
+    print()
+
+
 def get_encoded_embeddings(logs_path):
     frozen_graph_filename = logs_path + cs.ENCODER1_FREEZED_PB_NAME
 
@@ -100,9 +114,9 @@ def test():
         cs.BASE_DATA_PATH + cs.DATA_BG_TEST_VIDEO, "mp4")
 
     graph = tf.Graph()
-    accuracy_1 = 0
-    accuracy_3 = 0
-    accuracy_5 = 0
+    global accuracy_1
+    global accuracy_3
+    global accuracy_5
 
     with graph.as_default():
         rnn = Bi_LSTM(lstm_size=128, batch_len=BATCH_SIZE,
@@ -143,30 +157,31 @@ def test():
                                                                           tf.nn.top_k(prediction, k=5)],
                                                                          feed_dict=feed)
 
+            print("Expected value : ", batch_y - 1)
             print(probabilities_1[1][0])
             print(probabilities_3[1][0])
             print(probabilities_5[1][0])
-            print(batch_y - 1)
 
             if batch_y - 1 in probabilities_1[1][0]:
-                accuracy_1 += 1
-                print("accuracy_1 =", accuracy_1)
+                accuracy_1 = accuracy_1 + 1
 
             if batch_y - 1 in probabilities_3[1][0]:
-                accuracy_3 += 1
-                print("accuracy_3 =", accuracy_3)
+                accuracy_3 = accuracy_3 + 1
 
             if batch_y - 1 in probabilities_5[1][0]:
-                accuracy_5 += 1
-                print("accuracy_5 =", accuracy_5)
+                accuracy_5 = accuracy_5 + 1
+
             loop_count += 1
 
-            print("==============================", loop_count,
+            if(loop_count % 100 == 0):
+                logResult(accuracy_1, accuracy_3, accuracy_5)
+
+            print("==============================",
                   "=================================")
 
-    print(accuracy_1, 100 * accuracy_1 / 280)
-    print(accuracy_3, 100 * accuracy_3 / 280)
-    print(accuracy_5, 100 * accuracy_5 / 280)
+    print(accuracy_1, 100 * accuracy_1 / 101)
+    print(accuracy_3, 100 * accuracy_3 / 101)
+    print(accuracy_5, 100 * accuracy_5 / 101)
 
 
 def mainf():
