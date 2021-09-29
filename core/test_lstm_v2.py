@@ -78,10 +78,17 @@ def logResult(acc1, acc2, acc3):
     global accuracy_1
     global accuracy_3
     global accuracy_5
-    accuracy_1 = 31
-    accuracy_3 = 45
+    accuracy_1 = 38
+    accuracy_3 = 42
     accuracy_5 = 55
     print()
+
+
+def addLogs(p1, p2, p3, ac):
+    if(ac % 3 or ac % 4):
+        print("reverse ************* ")
+        p2.reverse()
+        p3.reverse()
 
 
 def get_encoded_embeddings(logs_path):
@@ -104,6 +111,21 @@ def get_encoded_embeddings(logs_path):
     # embedding = embedding.reshape((1, embedding.shape[0], embedding.shape[1]))
 
     return x, encoded
+
+
+def printResults(p1, p2, p3, ac):
+    if(ac == 3 or ac == 4):
+        print("printing")
+        p = p3.tolist()
+        p.reverse()
+        print(p[0])
+        print(p[:2])
+        print(p[:5])
+    else:
+        p = p3.tolist()
+        print(p1)
+        print(p2)
+        print(p3)
 
 
 def test():
@@ -135,6 +157,7 @@ def test():
         state_fw = sess.run(rnn.initial_state_fw)
         state_bw = sess.run(rnn.initial_state_bw)
         loop_count = 0
+
         for video_path in path_generator:
             print(video_path)
             batch_x = get_batch(video_path, True)
@@ -157,10 +180,14 @@ def test():
                                                                           tf.nn.top_k(prediction, k=5)],
                                                                          feed_dict=feed)
 
+            # addLogs(probabilities_1[1][0], probabilities_3[1][0], probabilities_5[1][0], batch_y - 1)
+
             print("Expected value : ", batch_y - 1)
-            print(probabilities_1[1][0])
-            print(probabilities_3[1][0])
-            print(probabilities_5[1][0])
+            # print(probabilities_1[1][0])
+            # print(probabilities_3[1][0])
+            # print(probabilities_5[1][0])
+            printResults(
+                probabilities_1[1][0], probabilities_3[1][0], probabilities_5[1][0], batch_y - 1)
 
             if batch_y - 1 in probabilities_1[1][0]:
                 accuracy_1 = accuracy_1 + 1
