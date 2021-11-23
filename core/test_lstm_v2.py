@@ -192,7 +192,7 @@ def test():
             # print(probabilities_1[1][0])
             # print(probabilities_3[1][0])
             # print(probabilities_5[1][0])
-            printResult(
+            printResults(
                 probabilities_1[1][0], probabilities_3[1][0], probabilities_5[1][0], batch_y - 1)
 
             if batch_y - 1 in probabilities_1[1][0]:
