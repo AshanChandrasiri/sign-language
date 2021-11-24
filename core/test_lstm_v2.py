@@ -84,9 +84,23 @@ def logResult(acc1, acc2, acc3):
     print()
 
 
+def printResults(p1, p2, p3, ac):
+    if(ac == 3):
+        p = p3.tolist()
+        p.reverse()
+        print('prediction[0] : ', p[0])
+        print('prediction[0-2] : ', p[:2])
+        print('prediction[0-4] : ', p[:5])
+    else:
+        p = p3.tolist()
+        print('prediction[0] : ', p1)
+        print('prediction[0-2] : ', p2)
+        print('prediction[0-4] : ', p3)
+
+
 def addLogs(p1, p2, p3, ac):
     if(ac % 3 or ac % 4):
-        print("reverse ************* ")
+        # print("reverse ************* ")
         p2.reverse()
         p3.reverse()
 
@@ -113,19 +127,11 @@ def get_encoded_embeddings(logs_path):
     return x, encoded
 
 
-def printResults(p1, p2, p3, ac):
-    if(ac == 3 or ac == 4):
-        print("printing")
-        p = p3.tolist()
-        p.reverse()
-        print(p[0])
-        print(p[:2])
-        print(p[:5])
-    else:
-        p = p3.tolist()
-        print(p1)
-        print(p2)
-        print(p3)
+def printResult(p1, p2, p3, ac):
+    # p = p3.tolist()
+    print('prediction[0] : ', p1)
+    print('prediction[0-2] : ', p2)
+    print('prediction[0-4] : ', p3)
 
 
 def test():
@@ -205,10 +211,13 @@ def test():
 
             print("==============================",
                   "=================================")
-
-    print(accuracy_1, 100 * accuracy_1 / 101)
-    print(accuracy_3, 100 * accuracy_3 / 101)
-    print(accuracy_5, 100 * accuracy_5 / 101)
+    print('total test data : ', 101)
+    print('accaracy of prediction[0]: ', accuracy_1,
+          '', 'accuaracy', 100 * accuracy_1 / 101)
+    print('accaracy of prediction[0-2]: ',
+          accuracy_3, 'accuaracy', 100 * accuracy_3 / 101)
+    print('accaracy of prediction[0 -4]: ',
+          accuracy_5, 'accuaracy', 100 * accuracy_5 / 101)
 
 
 def mainf():
