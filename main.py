@@ -22,11 +22,11 @@ drive = GoogleDrive(gauth)
 
 print('start excutioon--------------')
 # prepare_data.main(drive)
-# train_auto_enocder_1.mainf()
+train_auto_enocder_1.mainf()
 
 # train_bi_lstm.mainf()
 
-test_lstm_v2.mainf()
+# test_lstm_v2.mainf()
 
 #file_list = drive.ListFile({'q': "'root' in parents and trashed=false"}).GetList()
 # for file1 in file_list:
